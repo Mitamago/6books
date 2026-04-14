@@ -7,6 +7,12 @@ interface ShareCardProps {
   books: (BookInfo | null)[];
 }
 
+function toProxiedUrl(src: string): string {
+  // data: URL（ローカル画像）はそのまま
+  if (src.startsWith("data:")) return src;
+  return `/api/image-proxy?url=${encodeURIComponent(src)}`;
+}
+
 export default function ShareCard({ userName, books }: ShareCardProps) {
   const displayName = userName.trim() || "あなた";
 
@@ -64,7 +70,7 @@ export default function ShareCard({ userName, books }: ShareCardProps) {
                 {book?.image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={book.image}
+                    src={toProxiedUrl(book.image)}
                     alt={book.title}
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     crossOrigin="anonymous"
