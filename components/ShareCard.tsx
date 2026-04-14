@@ -7,8 +7,6 @@ interface ShareCardProps {
   books: (BookInfo | null)[];
 }
 
-// このコンポーネントは html2canvas でキャプチャされる
-// id="share-card" を持つ要素が対象
 export default function ShareCard({ userName, books }: ShareCardProps) {
   const displayName = userName.trim() || "あなた";
 
@@ -16,52 +14,29 @@ export default function ShareCard({ userName, books }: ShareCardProps) {
     <div
       id="share-card"
       style={{
-        width: "1200px",
-        height: "630px",
-        backgroundColor: "#0a0a0a",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "48px",
-        fontFamily: "'Noto Serif JP', serif",
-        position: "relative",
-        overflow: "hidden",
+        width: "600px",
+        backgroundColor: "#e2a9f1",
+        padding: "36px 28px",
+        fontFamily: "'Noto Sans JP', sans-serif",
       }}
     >
-      {/* 背景装飾 */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 60%)",
-        }}
-      />
-
-      {/* タイトル */}
       <h1
         style={{
-          color: "#f5f0e8",
-          fontSize: "32px",
-          fontWeight: "400",
-          letterSpacing: "0.08em",
-          marginBottom: "40px",
+          color: "#1a1a1a",
+          fontSize: "22px",
+          fontWeight: "900",
           textAlign: "center",
-          position: "relative",
+          marginBottom: "28px",
         }}
       >
         {displayName}が推し続ける6書籍
       </h1>
 
-      {/* 書籍グリッド */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
-          gap: "24px",
-          width: "100%",
-          position: "relative",
+          gap: "16px",
         }}
       >
         {Array.from({ length: 6 }).map((_, i) => {
@@ -73,20 +48,17 @@ export default function ShareCard({ userName, books }: ShareCardProps) {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: "10px",
+                gap: "8px",
               }}
             >
-              {/* 表紙 */}
               <div
                 style={{
-                  width: "120px",
-                  height: "170px",
-                  backgroundColor: "#1a1a1a",
-                  borderRadius: "4px",
+                  width: "110px",
+                  height: "150px",
+                  backgroundColor: "rgba(255,255,255,0.5)",
+                  borderRadius: "8px",
                   overflow: "hidden",
-                  flexShrink: 0,
-                  position: "relative",
-                  border: "1px solid #2a2a2a",
+                  border: "2px solid rgba(255,255,255,0.8)",
                 }}
               >
                 {book?.image ? (
@@ -94,11 +66,7 @@ export default function ShareCard({ userName, books }: ShareCardProps) {
                   <img
                     src={book.image}
                     alt={book.title}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                    }}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     crossOrigin="anonymous"
                   />
                 ) : (
@@ -109,7 +77,7 @@ export default function ShareCard({ userName, books }: ShareCardProps) {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      color: "#3a3a3a",
+                      color: "rgba(255,255,255,0.6)",
                       fontSize: "28px",
                     }}
                   >
@@ -117,15 +85,14 @@ export default function ShareCard({ userName, books }: ShareCardProps) {
                   </div>
                 )}
               </div>
-
-              {/* テキスト */}
-              <div style={{ textAlign: "center", width: "100%" }}>
+              <div style={{ textAlign: "center", width: "110px" }}>
                 <p
                   style={{
-                    color: "#e8e3d8",
-                    fontSize: "12px",
-                    lineHeight: "1.5",
-                    margin: "0 0 4px",
+                    color: "#1a1a1a",
+                    fontSize: "11px",
+                    fontWeight: "700",
+                    lineHeight: "1.4",
+                    margin: "0 0 3px",
                     overflow: "hidden",
                     display: "-webkit-box",
                     WebkitBoxOrient: "vertical",
@@ -136,8 +103,8 @@ export default function ShareCard({ userName, books }: ShareCardProps) {
                 </p>
                 <p
                   style={{
-                    color: "#6b6b6b",
-                    fontSize: "11px",
+                    color: "#555",
+                    fontSize: "10px",
                     margin: 0,
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -152,15 +119,13 @@ export default function ShareCard({ userName, books }: ShareCardProps) {
         })}
       </div>
 
-      {/* フッター */}
       <p
         style={{
-          color: "#3a3a3a",
-          fontSize: "13px",
-          letterSpacing: "0.2em",
-          marginTop: "32px",
-          fontFamily: "monospace",
-          position: "relative",
+          textAlign: "center",
+          color: "rgba(0,0,0,0.35)",
+          fontSize: "11px",
+          marginTop: "24px",
+          letterSpacing: "0.15em",
         }}
       >
         my6books.jp

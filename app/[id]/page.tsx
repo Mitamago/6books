@@ -19,7 +19,6 @@ async function getShelf(id: string): Promise<ShelfData | null> {
     .select("*")
     .eq("id", id)
     .single();
-
   if (error || !data) return null;
   return data as ShelfData;
 }
@@ -31,27 +30,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const shelf = await getShelf(params.id);
   if (!shelf) return { title: "my6books" };
-
   const displayName = shelf.user_name || "あなた";
   const title = `${displayName}が推し続ける6書籍 | my6books`;
-  const description = shelf.books
-    .slice(0, 3)
-    .map((b) => b.title)
-    .join("、");
-
+  const description = shelf.books.slice(0, 3).map((b) => b.title).join("、");
   return {
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-    },
+    openGraph: { title, description, type: "website" },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 
@@ -64,26 +50,21 @@ export default async function SharePage({
   if (!shelf) notFound();
 
   const displayName = shelf.user_name || "あなた";
-  // books を 6枠に拡張
   const books: (BookInfo | null)[] = Array(6).fill(null);
-  shelf.books.forEach((b, i) => {
-    if (i < 6) books[i] = b;
-  });
+  shelf.books.forEach((b, i) => { if (i < 6) books[i] = b; });
 
   return (
-    <main className="min-h-screen py-12 px-4 max-w-4xl mx-auto">
+    <main className="min-h-screen bg-white px-5 pt-10 pb-12 max-w-lg mx-auto">
       {/* ヘッダー */}
-      <header className="text-center mb-10">
-        <p className="text-zinc-500 text-xs mb-1 tracking-widest font-mono">
-          my6books
-        </p>
-        <h1 className="text-2xl font-serif font-light tracking-wide text-[#f5f0e8]">
+      <header className="text-center mb-8">
+        <p className="text-xs text-gray-400 mb-1 tracking-widest">my6books</p>
+        <h1 className="text-2xl font-black">
           {displayName}が推し続ける6書籍
         </h1>
       </header>
 
       {/* 書籍グリッド */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mb-12">
+      <div className="flex flex-col gap-5 mb-10">
         {books.map((book, i) =>
           book ? (
             <a
@@ -91,59 +72,42 @@ export default async function SharePage({
               href={toAmazonAffiliateUrl(book.asin)}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex flex-col items-center gap-3 cursor-pointer"
+              className="flex gap-4 items-start active:opacity-70 transition-opacity"
             >
-              {/* 表紙 */}
-              <div className="relative w-full aspect-[2/3] bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800 group-hover:border-zinc-600 transition-colors">
+              <div className="relative w-24 h-32 flex-shrink-0 rounded-xl overflow-hidden border-2 border-black">
                 {book.image ? (
                   <Image
                     src={book.image}
                     alt={book.title}
                     fill
-                    className="object-cover group-hover:opacity-90 transition-opacity"
+                    className="object-cover"
                     unoptimized
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-zinc-700 text-3xl">
+                  <div className="w-full h-full bg-gray-100 flex items-center justify-center text-2xl">
                     {i + 1}
                   </div>
                 )}
               </div>
-
-              {/* テキスト */}
-              <div className="w-full text-center">
-                <p className="text-zinc-200 text-sm font-medium leading-snug line-clamp-2 group-hover:text-white transition-colors">
+              <div className="flex-1 pt-1">
+                <p className="text-sm font-bold leading-snug mb-1 line-clamp-3">
                   {book.title}
                 </p>
-                <p className="text-zinc-500 text-xs mt-1">{book.author}</p>
+                <p className="text-xs text-gray-500">{book.author}</p>
+                <p className="text-xs text-purple-400 mt-2">Amazonで見る →</p>
               </div>
-
-              {/* Amazonリンク表示 */}
-              <p className="text-zinc-600 text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                Amazonで見る →
-              </p>
             </a>
-          ) : (
-            <div
-              key={i}
-              className="flex flex-col items-center gap-3 opacity-20"
-            >
-              <div className="w-full aspect-[2/3] bg-zinc-900 rounded-lg border border-zinc-800 flex items-center justify-center">
-                <span className="text-zinc-700 text-3xl">{i + 1}</span>
-              </div>
-            </div>
-          )
+          ) : null
         )}
       </div>
 
-      {/* フッター */}
-      <div className="text-center border-t border-zinc-800 pt-8">
-        <p className="text-zinc-600 text-xs mb-4 font-mono tracking-widest">
-          my6books.jp
-        </p>
+      {/* フッター CTA */}
+      <div className="text-center border-t-2 border-black pt-8">
+        <p className="text-xs text-gray-400 mb-4 tracking-widest">my6books.jp</p>
         <a
           href="/"
-          className="inline-block px-6 py-3 bg-[#c9a84c] hover:bg-[#d4b05c] text-black text-sm font-medium rounded-lg transition-colors"
+          className="inline-block w-full h-14 rounded-2xl border-2 border-black text-base font-bold flex items-center justify-center"
+          style={{ backgroundColor: "#c9a3e0" }}
         >
           あなたの6書籍を作る
         </a>
