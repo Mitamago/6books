@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { fetchBookByUrl, type BookInfo } from "@/lib/fetchBook";
@@ -14,6 +14,7 @@ type Step = "url" | "confirm" | "name" | "share";
 
 export default function Home() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<Step>("url");
   const [urls, setUrls] = useState<string[]>(Array(6).fill(""));
   const [books, setBooks] = useState<(BookInfo | null)[]>(Array(6).fill(null));
@@ -24,6 +25,25 @@ export default function Home() {
   const [shareId, setShareId] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState("");
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const id = searchParams.get("share");
+    if (!id) return;
+    fetch(`/api/shelf?id=${id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data || data.error) return;
+        const filled: (BookInfo | null)[] = Array(6).fill(null);
+        (data.books as BookInfo[]).forEach((b, i) => { if (i < 6) filled[i] = b; });
+        setBooks(filled);
+        setUserName(data.user_name ?? "");
+        setShareId(id);
+        setShareUrl(`${window.location.origin}/${id}`);
+        setStep("share");
+        router.replace("/");
+      })
+      .catch(() => {});
+  }, [searchParams, router]);
 
   async function fetchBook(index: number, url: string) {
     if (!url.trim()) return;
@@ -290,7 +310,7 @@ export default function Home() {
     return (
       <main className="min-h-screen bg-white px-5 pt-16 pb-10 max-w-lg mx-auto flex flex-col">
         <h1 className="text-2xl font-black text-black text-center mb-12">
-          （{preview}）が推し続ける6書籍
+          {preview}が推し続ける6書籍
         </h1>
 
         <div className="flex-1 flex flex-col justify-center">
@@ -400,6 +420,13 @@ export default function Home() {
         className="w-full h-12 rounded-xl border border-gray-200 bg-gray-50 text-gray-600 text-sm mb-6"
       >
         シェアページを確認する →
+      </button>
+
+      <button
+        onClick={() => setStep("name")}
+        className="w-full text-center text-sm text-gray-500 py-2"
+      >
+        ← 戻る
       </button>
 
       <button

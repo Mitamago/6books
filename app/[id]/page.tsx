@@ -4,6 +4,7 @@ import Image from "next/image";
 import { createServiceClient } from "@/lib/supabase";
 import { toAmazonAffiliateUrl } from "@/lib/affiliateLink";
 import type { BookInfo } from "@/lib/fetchBook";
+import BackButton from "@/components/BackButton";
 
 interface ShelfData {
   id: string;
@@ -57,8 +58,8 @@ export default async function SharePage({
     <main className="min-h-screen bg-white px-5 pt-10 pb-12 max-w-lg mx-auto">
       {/* ヘッダー */}
       <header className="text-center mb-8">
-        <p className="text-xs text-gray-400 mb-1 tracking-widest">my6books</p>
-        <h1 className="text-2xl font-black">
+        <p className="text-xs text-black mb-1 tracking-widest">my6books</p>
+        <h1 className="text-2xl font-black" style={{ color: "#e2a9f1" }}>
           {displayName}が推し続ける6書籍
         </h1>
       </header>
@@ -72,7 +73,7 @@ export default async function SharePage({
               href={toAmazonAffiliateUrl(book.asin)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex gap-4 items-start active:opacity-70 transition-opacity"
+              className="flex gap-4 items-start active:opacity-70 transition-opacity text-black"
             >
               <div className="relative w-24 h-32 flex-shrink-0 rounded-xl overflow-hidden border-2 border-black">
                 {book.image ? (
@@ -93,8 +94,8 @@ export default async function SharePage({
                 <p className="text-sm font-bold leading-snug mb-1 line-clamp-3">
                   {book.title}
                 </p>
-                <p className="text-xs text-gray-500">{book.author}</p>
-                <p className="text-xs text-purple-400 mt-2">Amazonで見る →</p>
+                <p className="text-xs text-black">{book.author}</p>
+                <p className="text-xs text-black mt-2">Amazonで見る →</p>
               </div>
             </a>
           ) : null
@@ -103,14 +104,17 @@ export default async function SharePage({
 
       {/* フッター CTA */}
       <div className="text-center border-t-2 border-black pt-8">
-        <p className="text-xs text-gray-400 mb-4 tracking-widest">my6books.jp</p>
+        <p className="text-xs text-black mb-4 tracking-widest">my6books.jp</p>
         <a
           href="/"
-          className="inline-block w-full h-14 rounded-2xl border-2 border-black text-base font-bold flex items-center justify-center"
+          className="inline-block w-full h-14 rounded-2xl border-2 border-black text-base font-bold flex items-center justify-center text-black"
           style={{ backgroundColor: "#c9a3e0" }}
         >
           あなたの6書籍を作る
         </a>
+        <div className="mt-3">
+          <BackButton shareId={shelf.id} />
+        </div>
       </div>
     </main>
   );
