@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -12,9 +12,42 @@ const ShareCard = dynamic(() => import("@/components/ShareCard"), {
 
 type Step = "url" | "confirm" | "name" | "share";
 
+type RestorePayload = {
+  books: (BookInfo | null)[];
+  userName: string;
+  shareId: string;
+  shareUrl: string;
+};
+
+function ShareRestorer({ onRestore }: { onRestore: (p: RestorePayload) => void }) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const id = searchParams.get("share");
+    if (!id) return;
+    fetch(`/api/shelf?id=${id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data || data.error) return;
+        const filled: (BookInfo | null)[] = Array(6).fill(null);
+        (data.books as BookInfo[]).forEach((b, i) => { if (i < 6) filled[i] = b; });
+        onRestore({
+          books: filled,
+          userName: data.user_name ?? "",
+          shareId: id,
+          shareUrl: `${window.location.origin}/${id}`,
+        });
+        router.replace("/");
+      })
+      .catch(() => {});
+  }, [searchParams, router, onRestore]);
+
+  return null;
+}
+
 export default function Home() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [step, setStep] = useState<Step>("url");
   const [urls, setUrls] = useState<string[]>(Array(6).fill(""));
   const [books, setBooks] = useState<(BookInfo | null)[]>(Array(6).fill(null));
@@ -26,24 +59,13 @@ export default function Home() {
   const [shareUrl, setShareUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    const id = searchParams.get("share");
-    if (!id) return;
-    fetch(`/api/shelf?id=${id}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (!data || data.error) return;
-        const filled: (BookInfo | null)[] = Array(6).fill(null);
-        (data.books as BookInfo[]).forEach((b, i) => { if (i < 6) filled[i] = b; });
-        setBooks(filled);
-        setUserName(data.user_name ?? "");
-        setShareId(id);
-        setShareUrl(`${window.location.origin}/${id}`);
-        setStep("share");
-        router.replace("/");
-      })
-      .catch(() => {});
-  }, [searchParams, router]);
+  const handleRestore = useCallback((p: RestorePayload) => {
+    setBooks(p.books);
+    setUserName(p.userName);
+    setShareId(p.shareId);
+    setShareUrl(p.shareUrl);
+    setStep("share");
+  }, []);
 
   async function fetchBook(index: number, url: string) {
     if (!url.trim()) return;
@@ -155,6 +177,9 @@ export default function Home() {
   if (step === "url") {
     return (
       <main className="min-h-screen bg-white px-5 pt-10 pb-10 max-w-lg mx-auto flex flex-col">
+        <Suspense fallback={null}>
+          <ShareRestorer onRestore={handleRestore} />
+        </Suspense>
         <h1 className="text-2xl font-black text-black text-center mb-1">
           私が推し続ける6書籍
         </h1>
